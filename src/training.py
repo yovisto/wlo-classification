@@ -82,9 +82,11 @@ history = model.fit(X_train, Y_train, epochs=EPOCHS, batch_size=BATCH_SIZE,valid
 tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, min_delta=0.0001)])
 
 
-#### SAVE THE MODEL
+#### SAVE THE MODEL AND LABELS
 model.save(dataFile.replace('.csv','.h5'))
 
+labels = pd.get_dummies(df['discipline']).columns.values
+np.save(dataFile.replace('.csv','.npy'), labels)
 
 #### CHECK EVALUATION RESULTS
 print("EVALUATION")
