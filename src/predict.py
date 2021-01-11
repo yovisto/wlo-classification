@@ -7,12 +7,13 @@ import numpy as np
 
 modelFile = sys.argv[1]
 labelFile = sys.argv[2]
-example = [sys.argv[3]]
+tokenizerFile = sys.argv[3]
+example = [sys.argv[4]]
 
 print ("Predicting: '" + example[0] + "'")
 
 ### We need the same tokenizer as in the training script!
-tokenizer = pickle.load(open('tokenizer.pickle', 'rb'))
+tokenizer = pickle.load(open(tokenizerFile, 'rb'))
 
 # LOAD MODEL AND LABELS
 model = tf.keras.models.load_model(modelFile)
