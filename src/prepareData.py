@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json, os, codecs, sys
 
 path = sys.argv[1]
