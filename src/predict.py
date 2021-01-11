@@ -13,6 +13,7 @@ example = [sys.argv[4]]
 print ("Predicting: '" + example[0] + "'")
 
 ### We need the same tokenizer as in the training script!
+MAX_SEQUENCE_LENGTH=500
 tokenizer = pickle.load(open(tokenizerFile, 'rb'))
 
 # LOAD MODEL AND LABELS
@@ -20,6 +21,7 @@ model = tf.keras.models.load_model(modelFile)
 class_names = np.load(labelFile, allow_pickle=True)
 
 # PREDICTION
+
 seq = tokenizer.texts_to_sequences(example)
 padded = tf.keras.preprocessing.sequence.pad_sequences(seq, maxlen=MAX_SEQUENCE_LENGTH)
 pred = model.predict(padded)
