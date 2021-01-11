@@ -12,12 +12,7 @@ example = [sys.argv[3]]
 print ("Predicting: '" + example[0] + "'")
 
 ### We need the same tokenizer as in the training script!
-
-# The maximum number of words to be used. (most frequent)
-MAX_NB_WORDS = 10000
-# Max number of words in each text.
-MAX_SEQUENCE_LENGTH = 500
-tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=MAX_NB_WORDS, filters='!"#$%&()*+,-./:;<=>?@[\]^_`{|}~', lower=True)
+tokenizer = pickle.load(open('tokenizer.pickle', 'rb'))
 
 # LOAD MODEL AND LABELS
 model = tf.keras.models.load_model(modelFile)
