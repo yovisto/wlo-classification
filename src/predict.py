@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-import os
+import os, sys, pickle
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
 import numpy as np
-import sys
+
 
 modelFile = sys.argv[1]
 labelFile = sys.argv[2]
