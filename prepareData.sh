@@ -1,6 +1,7 @@
 
 # retrieve and unpack WLO dataset
 
+mkdir -p data
 cd data
 wget https://github.com/openeduhub/oeh-wlo-data-dump/raw/main/data/wirlernenonline.oeh.json.gz 
 gunzip wirlernenonline.oeh.json.gz
