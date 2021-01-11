@@ -85,8 +85,8 @@ tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, min_delta=0.000
 #### SAVE THE MODEL AND LABELS
 model.save(dataFile.replace('.csv','.h5'))
 
-labels = pd.get_dummies(df['discipline']).columns.values
-np.save(dataFile.replace('.csv','.npy'), labels)
+class_names = pd.get_dummies(df['discipline']).columns.values
+np.save(dataFile.replace('.csv','.npy'), class_names)
 
 #### CHECK EVALUATION RESULTS
 print("EVALUATION")
