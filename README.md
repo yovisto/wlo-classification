@@ -6,6 +6,8 @@ A [Docker](https://docker.com/)/[Python](https://www.python.org/)/[Keras](https:
 ## Prerequisites
 
 - Install [Docker](https://docker.com/).
+- The scripts require the Nvidia Docker runtime installed. For processing without a GPU remove the `--runtime=nvidia` parameter in the shell scripts docker commands.
+
 
 - Build the Docker container.
 
