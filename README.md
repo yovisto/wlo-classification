@@ -17,6 +17,8 @@ sh build.sh
 
 ## Training
 
+(The `data` folder already containes a pretrained model.)
+
 - The following script retrieves and processes the latest [dataset](https://github.com/openeduhub/oeh-wlo-data-dump), which results in the `data/wirlernenonline.oeh.csv` file containing the relevant documents (documents with a discipline property).
 
 ```
@@ -38,5 +40,6 @@ sh runPrediction.sh "Der Satz des Pythagoras lautet: a^2 + b^2 = c^2."
 ```
 
 The result is a list of tuples of a score and its corresponding class name (name of discipline). Only the top three items are retrieved in descending order.
+
 
 
