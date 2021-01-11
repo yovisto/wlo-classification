@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sys, re, nltk
+import os, sys, re, nltk, pickle
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -82,11 +82,15 @@ history = model.fit(X_train, Y_train, epochs=EPOCHS, batch_size=BATCH_SIZE,valid
 tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, min_delta=0.0001)])
 
 
-#### SAVE THE MODEL AND LABELS
+#### SAVE THE MODEL, LABELS AND TOKENIZER
 model.save(dataFile.replace('.csv','.h5'))
 
 class_names = pd.get_dummies(df['discipline']).columns.values
 np.save(dataFile.replace('.csv','.npy'), class_names)
+
+with open(dataFile.replace('.csv','.pickle'), 'wb') as handle:
+    pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
 #### CHECK EVALUATION RESULTS
 print("EVALUATION")
