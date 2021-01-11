@@ -61,8 +61,6 @@ print('Shapes of train test split:')
 print(X_train.shape,Y_train.shape)
 print(X_test.shape,Y_test.shape)
 
-with open(dataFile.replace('.csv','.pickle'), 'wb') as handle:
-    pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 #### DEFINE THE MODEL
 EMBEDDING_DIM = 50
