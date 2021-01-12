@@ -22,7 +22,7 @@ df.columns = ['discipline', 'text']
 
 df = df.reset_index(drop=True)
 REPLACE_BY_SPACE_RE = re.compile('[/(){}_\[\]\|@,;]')
-BAD_SYMBOLS_RE = re.compile('[^0-9a-zäöüß #+_]')
+BAD_SYMBOLS_RE = re.compile('[^0-9a-zäöüß ]')
 STOPWORDS = set(stopwords.words('german')).union(set(stopwords.words('english')))
 
 def clean_text(text):
