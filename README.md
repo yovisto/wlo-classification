@@ -24,7 +24,7 @@ sh build.sh
 sh prepareData.sh
 ```
 
-- This script initiates the training, which results in the model file `data/wirlernenonline.oeh.h5` and the file with class labels `data/wirlernenonline.oeh.npy` (existing files will be overwritten without warning).
+- This script initiates the training, which results in the model file `data/wirlernenonline.oeh.h5`, the file with class labels `data/wirlernenonline.oeh.npy`, and the tokenizer serialization `data/wirlernenonline.oeh.pickle` (existing files will be overwritten without warning).
 
 ```
 sh runTraining.sh
@@ -38,7 +38,7 @@ sh runTraining.sh
 sh runPrediction.sh "Der Satz des Pythagoras lautet: a^2 + b^2 = c^2."
 ```
 
-The result is a list of tuples of a score and its corresponding class name (name of discipline). Only the top three items are retrieved in descending order.
+The result is a list of tuples of a score and its corresponding class name (name of discipline). Only the top three items are retrieved, in descending order.
 
 
 
