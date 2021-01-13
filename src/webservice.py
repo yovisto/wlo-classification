@@ -9,7 +9,7 @@ class WebService(object):
    @cherrypy.expose
    @cherrypy.tools.json_out()
    @cherrypy.tools.json_in()
-   def predict_subject(self):
+   def predict_subjects(self):
       data = cherrypy.request.json
       print (data)
       output = r.run(data["text"])
