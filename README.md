@@ -40,5 +40,21 @@ sh runPrediction.sh "Der Satz des Pythagoras lautet: a^2 + b^2 = c^2."
 
 The result is a list of tuples of a score and its corresponding class name (name of discipline). Only the top three items are retrieved, in descending order.
 
+## Webservice
+
+- To run the subject prediction tool as a simple REST based webservice, the following script can be used:
+
+```
+sh runService.sh
+```
+
+- The scripts deploys a CherryPy webservice in a docker container listening at `http://localhost:8080/predict_subject`.
+
+- To retrieve the recommendations, create a POST request and submit a json document with a text as for example: 
+
+```
+curl -d '{"text" : "Der Satz des Pythagoras lautet: a^2 + b^2 = c^2."}' -H "Content-Type: application/json" -X POST http://0.0.0.0:8080/predict_subjects
+```	
+
 
 
