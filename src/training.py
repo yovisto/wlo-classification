@@ -40,7 +40,7 @@ df['text'] = df['text'].str.replace('\d+', '')
 
 #### TOKENIZE AND CLEAN TEXT
 # The maximum number of words to be used. (most frequent)
-MAX_DICT_SIZE = 10000
+MAX_DICT_SIZE = 200000
 # Max number of words in each text.
 MAX_SEQUENCE_LENGTH = 500
 
@@ -56,14 +56,14 @@ print('Shape of data tensor:', X.shape)
 Y = pd.get_dummies(df['discipline']).values
 print('Shape of label tensor:', Y.shape)
 
-X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size = 0.2, random_state = 42)
+X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size = 0.1, random_state = 42)
 print('Shapes of train test split:')
 print(X_train.shape,Y_train.shape)
 print(X_test.shape,Y_test.shape)
 
 
 #### DEFINE THE MODEL
-EMBEDDING_DIM = 50
+EMBEDDING_DIM = 30
 
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.Embedding(MAX_DICT_SIZE, EMBEDDING_DIM, input_length=X.shape[1]))
