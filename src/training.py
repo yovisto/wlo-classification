@@ -83,7 +83,7 @@ model = tf.keras.Sequential()
 model.add(tf.keras.layers.Embedding(MAX_DICT_SIZE, EMBEDDING_DIM, input_length=X.shape[1]))
 model.add(tf.keras.layers.SpatialDropout1D(0.2))
 model.add(tf.keras.layers.LSTM(100))
-model.add(tf.keras.layers.Dense(61, activation='softmax'))
+model.add(tf.keras.layers.Dense(Y.shape[1], activation='softmax'))
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 model.summary()
 
