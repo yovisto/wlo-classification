@@ -20,10 +20,23 @@ df = pd.read_csv(dataFile,sep=',')
 df.columns = ['discipline', 'text']
 #print(df['discipline'].value_counts())
 
+# merge classess
+MAPPINGS={'28002':'120','3801':'380','niederdeutsch':'120','04014':'020', '450':'160','04013':'700','400':'900'}
+
+# cleanup classes
+MIN_NUM=1000
+for v, c in df.discipline.value_counts().iteritems():
+    if c<MIN_NUM:
+        MAPPINGS[v]='0'
+print (MAPPINGS)    
+
+for k in MAPPINGS.keys():
+    df = df.replace(k, MAPPINGS[k])
+
 df = df.reset_index(drop=True)
 REPLACE_BY_SPACE_RE = re.compile('[/(){}_\[\]\|@,;]')
 BAD_SYMBOLS_RE = re.compile('[^0-9a-zäöüß ]')
-STOPWORDS = set(stopwords.words('german')).union(set(stopwords.words('english')))
+STOPWORDS = set(stopwords.words('german')).union(set(stopwords.words('english'))).union(set(['https','http','lernen','wwwyoutubecom','video','videos','erklärt','einfach','nachhilfe','bitly','online','ordne','mehr','a','hilfe','amznto','wwwfacebookcom','zahlen','b','schule','kostenlos','c','facebook','klasse','unterricht','finden','de','richtigen','themen','fragen','gibt','studium','richtig','richtige','wissen','onlinenachhilfe','finde','schüler','learn','uni','teil','e','weitere','co','aufgaben','twittercom','bild','verben','einzelnen','wwwinstagramcom','berechnen','youtube','twitter','media','lernvideo','quiz','abitur','schnell','thema','free','zeit','website','angaben','erklärvideo','social','bestandteile','mal','top','findest','tet','beispiel','spaß','immer','urhebern','zwei','beim','viele','lizenzbedingungen','seite','kurze','besser','begriffe','infos','la','bzw','plattform','nachhilfeunterricht','lernhilfe','nachhilfelehrer','wurde','onlinehilfe','wer','onlinelehrer','findet','wwwtutoryde','kürze','ordnen','dokument','onlineunterricht','umsonst','world','us','merkhilfe','bereitstellung','schoolseasy','kanal','kostenlose','instagram','schülernachhilfe']))
 
 def clean_text(text):
     text = text.lower()
@@ -40,8 +53,9 @@ df['text'] = df['text'].str.replace('\d+', '')
 
 #### TOKENIZE AND CLEAN TEXT
 # The maximum number of words to be used. (most frequent)
-MAX_DICT_SIZE = 200000
+MAX_DICT_SIZE = 50000
 # Max number of words in each text.
+# should be the same as used in prediction
 MAX_SEQUENCE_LENGTH = 500
 
 tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=MAX_DICT_SIZE, filters='!"#$%&()*+,-./:;<=>?@[\]^_`{|}~', lower=True)
@@ -63,7 +77,7 @@ print(X_test.shape,Y_test.shape)
 
 
 #### DEFINE THE MODEL
-EMBEDDING_DIM = 30
+EMBEDDING_DIM = 50
 
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.Embedding(MAX_DICT_SIZE, EMBEDDING_DIM, input_length=X.shape[1]))
@@ -75,10 +89,10 @@ model.summary()
 
 
 ###### DO THE TRAINING
-EPOCHS = 10
-BATCH_SIZE = 128
+EPOCHS = 20
+BATCH_SIZE = 1024
 
-history = model.fit(X_train, Y_train, epochs=EPOCHS, batch_size=BATCH_SIZE,validation_split=0.3,callbacks=[
+history = model.fit(X_train, Y_train, epochs=EPOCHS, batch_size=BATCH_SIZE,validation_split=0.1,callbacks=[
 tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, min_delta=0.0001)])
 
 
