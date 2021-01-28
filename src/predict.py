@@ -7,6 +7,7 @@ import numpy as np
 
 class Prediction:
 	
+	#should be the same as used for training
 	MAX_SEQUENCE_LENGTH=500
 
 	tokenizer, model, class_names = None, None, None
@@ -24,9 +25,24 @@ class Prediction:
 		result = []
 		for i in range(len(pred[0])):
 		   result.append( (self.class_names[i], pred[0][i].astype(float) ))
-		rev = sorted(result, key=lambda x: x[1])[-3:]
-		rev.reverse()
-		return rev
+		r = sorted(result, key=lambda x: x[1])[-3:]
+		r.reverse()
+		t = 0.1
+		m=0.3
+		print (r)
+		d1 = r[1][0]-r[0][0]
+		d2 = r[2][0]-r[1][0]
+		#print (d1,d2)
+		if d1>t and d2 <t:
+		r = r[1:2]
+		if d1<t and d2 > t:
+			r = [r[2]]
+		f = []
+		for i in r:
+			if i[0]>m:
+			f.append(i)
+		print (f)
+		return f
 
 
 if __name__ == '__main__':	
