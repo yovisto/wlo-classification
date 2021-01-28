@@ -55,7 +55,7 @@ class Prediction:
 			r = [r[2]]
 		f = []
 		for i in r:
-			if i[1]>m:
+			if i[1]>m and not i[0]=='0':
 				f.append(i)
 		#print (f)
 		return f
