@@ -7,6 +7,8 @@ from sklearn import metrics
 from sklearn.model_selection import train_test_split
 nltk.download('stopwords')
 from nltk.corpus import stopwords
+from nltk.stem.snowball import SnowballStemmer
+stemmer = SnowballStemmer("german")
 
 dataFile = sys.argv[1]
 if not os.path.isfile(dataFile):
@@ -22,11 +24,13 @@ df.columns = ['discipline', 'text']
 
 # merge classess
 MAPPINGS={'28002':'120','3801':'380','niederdeutsch':'120','04014':'020', '450':'160','04013':'700','400':'900'}
+GARBAGE = ['020','700','04003','480','46014','160','720','060','520'] #,'240','460'
+# arbetislehre, wirtschaftskunde, mint, politik, astronomie, ethik, allgemein, kunst, religion, geschichte, physik
 
 # cleanup classes
 MIN_NUM=1000
 for v, c in df.discipline.value_counts().iteritems():
-    if c<MIN_NUM:
+    if c<MIN_NUM or v in GARBAGE:
         MAPPINGS[v]='0'
 print (MAPPINGS)    
 
@@ -42,7 +46,7 @@ def clean_text(text):
     text = text.lower()
     text = REPLACE_BY_SPACE_RE.sub(' ', text)
     text = BAD_SYMBOLS_RE.sub('', text)
-    text = ' '.join(word for word in text.split() if word not in STOPWORDS)
+    text = ' '.join(stemmer.stem(word) for word in text.split() if word not in STOPWORDS)
     return text
 
 #print (df['text'][:5])
@@ -115,6 +119,7 @@ print("Testing prediction ...")
 y_pred = model.predict(X_test)
 yyy = np.zeros_like(y_pred)
 yyy[np.arange(len(y_pred)), y_pred.argmax(1)] = 1
-print(metrics.classification_report(Y_test, yyy, target_names=df['discipline'].unique()) )
+labels = pd.get_dummies(df['discipline']).columns.values
+print(metrics.classification_report(Y_test, yyy, target_names=labels) )
 
 print ("We are done!")
