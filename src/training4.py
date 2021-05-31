@@ -15,6 +15,7 @@ if not os.path.isfile(dataFile):
     print("File '" + dataFile + "' does not exits.")
     sys.exit(1)
 
+print ("Datafile:", dataFile)
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
