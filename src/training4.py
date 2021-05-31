@@ -37,20 +37,20 @@ for i in disciplines.values:
     disciplinesDict[i[0]]=i[1]
 #print (disciplinesDict)
 
-def disciplineToLabel(text):
-    if text in disciplinesDict.keys():    
-        return disciplinesDict[text]
-    else:
-        return text
+#def disciplineToLabel(text):
+##    if text in disciplinesDict.keys():    
+#        return disciplinesDict[text]
+#    else:
+#        return text
 
 
 ### LOAD AND PREPROCESS THE DATASET
 df = pd.read_csv(dataFile,sep=',')
 df.columns = ['discipline', 'text']
 df=df.drop_duplicates()
-print("Number of samples:" ,df['discipline'].value_counts())
+print("Number of samples:" ,len(df))
 
-df['discipline'] = df['discipline'].apply(disciplineToLabel)
+#df['discipline'] = df['discipline'].apply(disciplineToLabel)
 
 # merge classess
 MAPPINGS={'28002':'120','3801':'380','niederdeutsch':'120','04014':'020', '450':'160','04013':'700','400':'900'}
