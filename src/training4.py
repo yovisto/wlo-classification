@@ -77,12 +77,13 @@ GARBAGE = ['20003','020','48005','260','04006','50001','64018','340','900','440'
 
 MAPPINGSD = {}
 for k in MAPPINGS:
-    MAPPINGSD[disciplinesDict[k]]=disciplinesDict[MAPPINGS[k]]
+    #MAPPINGSD[disciplinesDict[k]]=disciplinesDict[MAPPINGS[k]]
+    MAPPINGSD[k]= MAPPINGS[k]
 #print (MAPPINGSD)
 
 GARBAGED=[]
 for k in GARBAGE:
-    GARBAGED.append(disciplinesDict[k]) 
+    GARBAGED.append(dk) 
 
 # cleanup classes
 MIN_NUM=50
