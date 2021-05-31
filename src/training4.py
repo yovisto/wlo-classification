@@ -83,7 +83,7 @@ for k in MAPPINGS:
 
 GARBAGED=[]
 for k in GARBAGE:
-    GARBAGED.append(dk) 
+    GARBAGED.append(k) 
 
 # cleanup classes
 MIN_NUM=50
