@@ -47,7 +47,8 @@ def disciplineToLabel(text):
 ### LOAD AND PREPROCESS THE DATASET
 df = pd.read_csv(dataFile,sep=',')
 df.columns = ['discipline', 'text']
-#print(df['discipline'].value_counts())
+df=df.drop_duplicates()
+print("Number of samples:" ,df['discipline'].value_counts())
 
 df['discipline'] = df['discipline'].apply(disciplineToLabel)
 
@@ -115,7 +116,7 @@ df['text'] = df['text'].str.replace('\d+', '')
 
 #### TOKENIZE AND CLEAN TEXT
 # The maximum number of words to be used. (most frequent)
-MAX_DICT_SIZE = 50000
+MAX_DICT_SIZE = 100000
 # Max number of words in each text.
 # should be the same as used in prediction
 MAX_SEQUENCE_LENGTH = 500
