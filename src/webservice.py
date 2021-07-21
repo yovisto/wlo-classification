@@ -1,4 +1,4 @@
-import cherrypy, json, sys
+import cherrypy, json, sys, cherrypy_cors
 
 from predict import Prediction
 
@@ -24,6 +24,7 @@ if __name__ == '__main__':
 
    r = Prediction(modelFile, labelFile, tokenizerFile)
 
-   config = {'server.socket_host': '0.0.0.0'}
+   config = {'server.socket_host': '0.0.0.0', 'cors.expose.on': True}
+   cherrypy_cors.install()
    cherrypy.config.update(config)
    cherrypy.quickstart(WebService())	
