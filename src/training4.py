@@ -56,7 +56,7 @@ print("Number of samples:" ,len(df))
 MAPPINGS={'28002':'120','3801':'380','niederdeutsch':'120','04014':'020', '450':'160','04013':'700','400':'900'}
 # DaZ, Zahlen, Algebra, Niederdeutsch, Arbeitssicherheit, Philosophie, Wirtschaft und Verwaltung, Mediendidaktik
 
-GARBAGE = ['20003','020','48005','260','04006','50001','64018','340','900','440','44007','04012','640','12002','700'] 
+GARBAGE = ['20003','020','48005','260','04006','50001','64018','340','900','440','44007','04012','640','12002','700','72001','44099'] 
 #GARBAGE = []
 #Alt-Griechisch 20003
 #Arbeitslehre 020
@@ -89,7 +89,7 @@ for k in GARBAGE:
 MIN_NUM=50
 for v, c in df.discipline.value_counts().iteritems():
     if c<MIN_NUM or v in GARBAGED:
-        MAPPINGSD[v]='garbage'
+        MAPPINGSD[v]='other'
 #print (MAPPINGSD)    
 
 for k in MAPPINGSD.keys():
@@ -157,7 +157,7 @@ EPOCHS = 20
 BATCH_SIZE = 1024
 
 history = model.fit(X_train, Y_train, epochs=EPOCHS, batch_size=BATCH_SIZE,validation_split=0.1,callbacks=[
-tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, min_delta=0.0001)])
+tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, min_delta=0.0001)])
 
 
 #### SAVE THE MODEL, LABELS AND TOKENIZER
