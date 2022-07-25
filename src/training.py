@@ -20,7 +20,7 @@ print("Num GPUs available: ", len(tf.config.experimental.list_physical_devices('
 ### LOAD AND PREPROCESS THE DATASET
 df = pd.read_csv(dataFile,sep=',')
 df.columns = ['discipline', 'text']
-#print(df['discipline'].value_counts())
+print(df['discipline'].value_counts())
 
 # merge classess
 MAPPINGS={'28002':'120','3801':'380','niederdeutsch':'120','04014':'020', '450':'160','04013':'700','400':'900'}
