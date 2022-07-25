@@ -20,18 +20,43 @@ def getText(props):
             text = text + " " + val
     if kwkeys[0] in props.keys():
         text = text + " " + " ".join(props[kwkeys[0]])
-    return text.replace('"','').replace('\n',' ')
+    return text.replace('"','').replace('\r',' ').replace('\n',' ')
+
+def valid(json_data):
+    if "ccm:collection_io_reference" in json_data.get("_source", None).get("aspects"):
+        return False
+    # filter collections
+    if json_data.get("_source", None).get("type") != "ccm:io":
+        return False
+
+    # filter archived and other data
+    if json_data.get("_source", None).get("nodeRef").get("storeRef").get("protocol") != "workspace":
+        return False
+
+    if json_data.get("_source", None).get("properties").get("cclom:format") == "application/zip":
+        return False
+
+    if json_data.get("_source", None).get("properties").get("cclom:title") == None:
+        return False
+
+    if json_data.get("_source", None).get("owner") == "WLO-Upload":
+        return False
+
+    if json_data.get("_source", None).get("properties").get("cm:edu_metadataset") != "mds_oeh":
+        return False
+    
+    return True
 
 with open(path) as f:
-    for line in f:
+    for line in f:   
         jline=json.loads(line)
         id = jline['_source']['nodeRef']['id']
-        props = jline['_source']['properties']
-        if 'ccm:taxonid' in props.keys():
-            disciplines = set(props['ccm:taxonid'])
-            text = getText(props)
-            for discipline in disciplines:
-                dis = discipline.replace('http://w3id.org/openeduhub/vocabs/discipline/','').replace('https://w3id.org/openeduhub/vocabs/discipline/','')
-                l = dis + ',"' + text + '"\n'
+        props = jline['_source']['properties']   
+        if valid(jline) and 'ccm:taxonid' in props.keys():
+            disciplines = set(props['ccm:taxonid'])            
+            text = getText(props)            
+            for disci in disciplines:
+                dis = disci.replace('http://w3id.org/openeduhub/vocabs/discipline/','').replace('https://w3id.org/openeduhub/vocabs/discipline/','')
+                l = '"' + dis + '","' + text.strip() + '"\n'
                 csv.write(l);
 csv.close()
