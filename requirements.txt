@@ -7,3 +7,4 @@ nltk
 tensorflow
 tensorflow_datasets
 cherrypy
+transformers
