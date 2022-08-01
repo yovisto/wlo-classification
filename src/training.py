@@ -189,7 +189,7 @@ model.compile(optimizer=optim, loss=loss_func, metrics=[acc])
 history = model.fit(
     train_dataset,
     validation_data=val_dataset,
-    epochs=20,    
+    epochs=10,    
 )
 
 #### SAVE THE MODEL, LABELS AND TOKENIZER
