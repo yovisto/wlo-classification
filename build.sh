@@ -1,1 +1,1 @@
-docker build --tag wlo-cuda:1.0 .
+docker build --tag wlo-cuda:2.0 .
