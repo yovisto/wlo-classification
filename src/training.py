@@ -9,34 +9,101 @@ nltk.download('stopwords')
 from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
 stemmer = SnowballStemmer("german")
+from transformers import BertTokenizer, TFBertModel
+from tqdm.auto import tqdm
 
 dataFile = sys.argv[1]
 if not os.path.isfile(dataFile):
     print("File '" + dataFile + "' does not exits.")
     sys.exit(1)
 
-print("Num GPUs available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+print ("Datafile:", dataFile)
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+  try:
+    # Currently, memory growth needs to be the same across GPUs
+    for gpu in gpus:
+      tf.config.experimental.set_memory_growth(gpu, True)
+    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+  except RuntimeError as e:
+    # Memory growth must be set before GPUs have been initialized
+    print(e)
+print("Num GPUs available: ", len(gpus))
+
+#### LOAD DISCIPLINES
+disciplines=pd.read_csv("../data/disciplines.csv", sep=';', dtype=str, header=None)
+disciplines.columns = ['discipline', 'label']
+disciplinesDict={}
+for i in disciplines.values:
+    disciplinesDict[i[0]]=i[1]
+#print (disciplinesDict)
+
+#def disciplineToLabel(text):
+##    if text in disciplinesDict.keys():    
+#        return disciplinesDict[text]
+#    else:
+#        return text
+
+blacklist=[]
 
 ### LOAD AND PREPROCESS THE DATASET
-df = pd.read_csv(dataFile,sep=',')
+df = pd.read_csv(dataFile,sep=',', dtype=str, header=None)
 df.columns = ['discipline', 'text']
-print(df['discipline'].value_counts())
+df=df.drop_duplicates()
+for b in blacklist:
+    df.drop(df[df['discipline'] == b].index, inplace=True)
+
+#samples=1000
+#df=df[:samples]
+
+print("Number of samples:" ,len(df))
+
+#df['discipline'] = df['discipline'].apply(disciplineToLabel)
 
 # merge classess
 MAPPINGS={'28002':'120','3801':'380','niederdeutsch':'120','04014':'020', '450':'160','04013':'700','400':'900'}
-GARBAGE = ['20003','020','48005','260','04006','50001','64018','340','900','440','44007','04012','640','12002','700','72001','44099'] 
-# arbeitslehre, wirtschaftskunde, mint, politik, astronomie, ethik, allgemein, kunst, religion, geschichte, physik
+# DaZ, Zahlen, Algebra, Niederdeutsch, Arbeitssicherheit, Philosophie, Wirtschaft und Verwaltung, Mediendidaktik
 
+GARBAGE = ['20003','020','48005','260','04006','50001','64018','340','900','440','44007','04012','640','12002','700','72001','44099'] 
+#GARBAGE = []
+#Alt-Griechisch 20003
+#Arbeitslehre 020
+#Gesellschaftskunde 48005
+#Gesundheit 260
+#'04006': 'Ernährung_und_Hauswirtschaft'
+#'50001': 'Hauswirtschaft'
+#Nachhaltigkeit 64018
+#Interkulturelle_Bildung 340
+#Medienbildung 900
+#Pädagogik 440
+#Sozialpädagogik 44007
+#Textiltechnik_und_Bekleidung 04012
+#Umweltschuztz 640
+#'12002': 'Darstellendes_Spiel'
+#'700': 'Wirtschaftskunde'
+
+
+MAPPINGSD = {}
+for k in MAPPINGS:
+    #MAPPINGSD[disciplinesDict[k]]=disciplinesDict[MAPPINGS[k]]
+    MAPPINGSD[k]= MAPPINGS[k]
+#print (MAPPINGSD)
+
+GARBAGED=[]
+for k in GARBAGE:
+    GARBAGED.append(k) 
 
 # cleanup classes
-MIN_NUM=500
+MIN_NUM=50
 for v, c in df.discipline.value_counts().iteritems():
-    if c<MIN_NUM or v in GARBAGE:
-        MAPPINGS[v]='0'
-print (MAPPINGS)    
+    if c<MIN_NUM or v in GARBAGED:
+        MAPPINGSD[v]='other'
+#print (MAPPINGSD)    
 
-for k in MAPPINGS.keys():
-    df = df.replace(k, MAPPINGS[k])
+for k in MAPPINGSD.keys():
+    df = df.replace(k, MAPPINGSD[k])
+
 
 df = df.reset_index(drop=True)
 REPLACE_BY_SPACE_RE = re.compile('[/(){}_\[\]\|@,;]')
@@ -52,75 +119,83 @@ def clean_text(text):
 
 #print (df['text'][:5])
 df['text'] = df['text'].apply(clean_text)
-df['text'] = df['text'].str.replace('\d+', '')
+df['text'] = df['text'].str.replace('\d+', '', regex=True)
 #print (df['text'][:5])
 
 
 #### TOKENIZE AND CLEAN TEXT
-# The maximum number of words to be used. (most frequent)
-MAX_DICT_SIZE = 50000
-# Max number of words in each text.
-# should be the same as used in prediction
-MAX_SEQUENCE_LENGTH = 500
+tokenizer = BertTokenizer.from_pretrained("deepset/gbert-base")
 
-tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=MAX_DICT_SIZE, filters='!"#$%&()*+,-./:;<=>?@[\]^_`{|}~', lower=True)
-tokenizer.fit_on_texts(df['text'].values)
-word_index = tokenizer.word_index
-print('Found %s unique tokens.' % len(word_index))
+def generate_training_data(df, ids, masks, tokenizer):
+    for i, text in tqdm(enumerate(df['text'])):
+        tokenized_text = tokenizer.encode_plus(
+            text,
+            max_length=256, 
+            truncation=True, 
+            padding='max_length', 
+            add_special_tokens=True,
+            return_tensors='tf'
+        )
+        ids[i, :] = tokenized_text.input_ids
+        masks[i, :] = tokenized_text.attention_mask
+    return ids, masks
 
-X = tokenizer.texts_to_sequences(df['text'].values)
-X = tf.keras.preprocessing.sequence.pad_sequences(X, maxlen=MAX_SEQUENCE_LENGTH)
-print('Shape of data tensor:', X.shape)
+
+X_input_ids = np.zeros((len(df), 256))
+X_attn_masks = np.zeros((len(df), 256))
+
+X_input_ids, X_attn_masks = generate_training_data(df, X_input_ids, X_attn_masks, tokenizer)
+
+labels = pd.get_dummies(df['discipline'])
+ds = tf.data.Dataset.from_tensor_slices((X_input_ids, X_attn_masks, labels))
 
 Y = pd.get_dummies(df['discipline']).values
-print('Shape of label tensor:', Y.shape)
 
-X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size = 0.1, random_state = 42)
-print('Shapes of train test split:')
-print(X_train.shape,Y_train.shape)
-print(X_test.shape,Y_test.shape)
+def DatasetMapFunction(input_ids, attn_masks, labels):
+    return {
+        'input_ids': input_ids,
+        'attention_mask': attn_masks
+    }, labels
 
+ds = ds.map(DatasetMapFunction)
+
+BATCH_SIZE=64
+dataset = ds.batch(BATCH_SIZE, drop_remainder=True).prefetch(tf.data.experimental.AUTOTUNE) 
+DATASET_SIZE=len(df)//BATCH_SIZE
+train_size = int(0.8 * DATASET_SIZE)
+val_size = int(0.2 * DATASET_SIZE)
+train_dataset = dataset.take(train_size)
+val_dataset = dataset.skip(train_size)
 
 #### DEFINE THE MODEL
-EMBEDDING_DIM = 50
 
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Embedding(MAX_DICT_SIZE, EMBEDDING_DIM, input_length=X.shape[1]))
-model.add(tf.keras.layers.SpatialDropout1D(0.2))
-model.add(tf.keras.layers.LSTM(100))
-model.add(tf.keras.layers.Dense(Y.shape[1], activation='softmax'))
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model = TFBertModel.from_pretrained("deepset/gbert-base")
+input_ids = tf.keras.layers.Input(shape=(256,), name='input_ids', dtype='int32')
+attn_masks = tf.keras.layers.Input(shape=(256,), name='attention_mask', dtype='int32')
+
+bert_embds = model.bert(input_ids, attention_mask=attn_masks)[1] 
+intermediate_layer = tf.keras.layers.Dense(512, activation='relu', name='intermediate_layer')(bert_embds)
+output_layer = tf.keras.layers.Dense(len(df['discipline'].value_counts()), activation='softmax', name='output_layer')(intermediate_layer)
+model = tf.keras.Model(inputs=[input_ids, attn_masks], outputs=output_layer)
 model.summary()
 
+optim = tf.keras.optimizers.Adam(learning_rate=1e-6, decay=1e-7)
+loss_func = tf.keras.losses.CategoricalCrossentropy()
+acc = tf.keras.metrics.CategoricalAccuracy('accuracy')
+
+model.compile(optimizer=optim, loss=loss_func, metrics=[acc])
 
 ###### DO THE TRAINING
-EPOCHS = 20
-BATCH_SIZE = 1024
-
-history = model.fit(X_train, Y_train, epochs=EPOCHS, batch_size=BATCH_SIZE,validation_split=0.1,callbacks=[
-tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, min_delta=0.0001)])
-
+history = model.fit(
+    train_dataset,
+    validation_data=val_dataset,
+    epochs=20,    
+)
 
 #### SAVE THE MODEL, LABELS AND TOKENIZER
-model.save(dataFile.replace('.csv','.h5'))
+model.save(dataFile.replace('.csv','-model'))
 
 class_names = pd.get_dummies(df['discipline']).columns.values
-np.save(dataFile.replace('.csv','.npy'), class_names)
-
-with open(dataFile.replace('.csv','.pickle'), 'wb') as handle:
-    pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-#### CHECK EVALUATION RESULTS
-print("EVALUATION")
-accr = model.evaluate(X_test,Y_test)
-print('Test set\n  Loss: {:0.3f}\n  Accuracy: {:0.3f}'.format(accr[0],accr[1]))
-
-print("Testing prediction ...")
-y_pred = model.predict(X_test)
-yyy = np.zeros_like(y_pred)
-yyy[np.arange(len(y_pred)), y_pred.argmax(1)] = 1
-labels = pd.get_dummies(df['discipline']).columns.values
-print(metrics.classification_report(Y_test, yyy, target_names=labels) )
+np.save(dataFile.replace('.csv','_class_names.npy'), class_names)
 
 print ("We are done!")
