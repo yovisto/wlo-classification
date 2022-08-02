@@ -13,7 +13,7 @@ class WebService(object):
       data = cherrypy.request.json
       print (data)
       output = r.run(data["text"])
-      return json.dumps(output)
+      return output
 
 
 if __name__ == '__main__':
