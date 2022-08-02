@@ -32,7 +32,7 @@ if gpus:
 print("Num GPUs available: ", len(gpus))
 
 #### LOAD DISCIPLINES
-disciplines=pd.read_csv("../data/disciplines.csv", sep=';', dtype=str, header=None)
+disciplines=pd.read_csv("/data/disciplines.csv", sep=';', dtype=str, header=None)
 disciplines.columns = ['discipline', 'label']
 disciplinesDict={}
 for i in disciplines.values:
