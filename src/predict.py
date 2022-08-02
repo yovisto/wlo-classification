@@ -74,12 +74,14 @@ class Prediction:
 			r = [r[2]]
 		f = []
 		for i in r:
-			if i[1]>m: # and not i[0]=='other':
+			if i[1]>m: 
 				f.append(i)
-		
-
-		#print (f)
-		return f
+		result = []
+		for e in f:
+			if len(f)>1:
+				if e[0]!='other':
+					result.append(e)
+		return e
 
 
 if __name__ == '__main__':	
