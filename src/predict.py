@@ -81,6 +81,8 @@ class Prediction:
 			if len(f)>1:
 				if e[0]!='other':
 					result.append(e)
+			else:
+				result.append(e)
 		return result
 
 
