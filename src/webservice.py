@@ -19,7 +19,7 @@ class WebService(object):
 if __name__ == '__main__':
 
    modelFile = sys.argv[1]
-   tokenizerFile = sys.argv[2]
+   labelFile = sys.argv[2]
 
    r = Prediction(modelFile, labelFile)
 
