@@ -74,7 +74,7 @@ class Prediction:
 			r = [r[2]]
 		f = []
 		for i in r:
-			if i[1]>m and not i[0]=='other':
+			if i[1]>m and:# not i[0]=='other':
 				f.append(i)
 		
 
