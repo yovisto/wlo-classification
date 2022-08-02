@@ -11,13 +11,15 @@ np.set_printoptions(suppress=True)
 
 class Prediction:
 
-	tokenizer, model, class_names = None, None, None
+	tokenizer, model = None, None
 
-	def __init__(self, modelFile, labelFile):
+	# class names ant its order need to fit to the model
+	class_names= ['040', '04003', '060', '080', '100', '120', '160', '20001', '20002', '20004', '20005', '20006', '20007', '20008', '220', '240','28010', '320', '380', '420', '460', '46014', '480', '50005','510', '520', '600', '720', 'other']
+
+	def __init__(self, modelFile):
 		### We need the same tokenizer as in the training script!!
 		self.tokenizer = BertTokenizer.from_pretrained("deepset/gbert-base")		
-		self.model = tf.keras.models.load_model(modelFile)
-		self.class_names = np.load(labelFile, allow_pickle=True)
+		self.model = tf.keras.models.load_model(modelFile)		
 
 	REPLACE_BY_SPACE_RE = re.compile('[/(){}_\[\]\|@,;]')
 	BAD_SYMBOLS_RE = re.compile('[^0-9a-zäöüß ]')
@@ -81,12 +83,11 @@ class Prediction:
 if __name__ == '__main__':	
 
 	modelFile = sys.argv[1]
-	labelFile = sys.argv[2]	
 	text = sys.argv[3]
 
 	print ("Predicting: '" + text + "'")
 
-	r = Prediction(modelFile, labelFile)
+	r = Prediction(modelFile)
 	for r in r.run(text):
 		print (r)
 
