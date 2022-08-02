@@ -81,7 +81,7 @@ class Prediction:
 			if len(f)>1:
 				if e[0]!='other':
 					result.append(e)
-		return e
+		return result
 
 
 if __name__ == '__main__':	
