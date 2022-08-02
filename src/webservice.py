@@ -18,10 +18,9 @@ class WebService(object):
 
 if __name__ == '__main__':
 
-   modelFile = sys.argv[1]
-   labelFile = sys.argv[2]
+   modelFile = sys.argv[1]   
 
-   r = Prediction(modelFile, labelFile)
+   r = Prediction(modelFile)
 
    config = {'server.socket_host': '0.0.0.0'}
    cherrypy.config.update(config)
