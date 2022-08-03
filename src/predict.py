@@ -89,7 +89,7 @@ class Prediction:
 if __name__ == '__main__':	
 
 	modelFile = sys.argv[1]
-	text = sys.argv[3]
+	text = sys.argv[2]
 
 	print ("Predicting: '" + text + "'")
 
