@@ -1,6 +1,6 @@
-# WLO Discipline Classification
+# Discipline Classification
 
-A [Docker](https://docker.com/)/[Python](https://www.python.org/)/[Keras](https://keras.io/)/[Tensorflow](https://www.tensorflow.org/) utility to train and predict *subject areas* for the [WLO project](https://github.com/openeduhub/) dataset.
+A [Docker](https://docker.com/)/[Python](https://www.python.org/)/[Keras](https://keras.io/)/[Tensorflow](https://www.tensorflow.org/) utility to train and predict *subject areas* for the [openeduhub](https://github.com/openeduhub/) dataset.
 
  
 ## Prerequisites
